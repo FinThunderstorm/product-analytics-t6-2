@@ -14,12 +14,6 @@ function main {
   popd
   echo ::endgroup::
 
-  echo ::group::Build the application
-  check_uv
-  mkdir -p $repository/output
-  uv run --with jupyter jupyter nbconvert --no-input --execute --embed-images --output $repository/output/index.html --to html $repository/telepass.ipynb
-  echo ::endgroup::
-
   echo ::group::Deploy the application
   pushd "$repository/infra"
   tofu apply -input=false -auto-approve
