@@ -27,7 +27,7 @@ function required_command() {
 }
 
 function check_uv() {
-    if ! uv --version $1 &> /dev/null
+    if ! uv --version &> /dev/null
     then
         python3 -m pip install uv
     fi
