@@ -1,0 +1,62 @@
+resource "aws_s3_bucket" "app" {
+  bucket = replace("${var.domain_name}.${var.base_domain_name}-content-bucket", "/\\W/", "-")
+  tags = {
+    Environment = var.environment
+    Name        = "${var.domain_name}.${var.base_domain_name}-content-bucket"
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "app" {
+  bucket = aws_s3_bucket.app.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "app" {
+  depends_on = [aws_s3_bucket_ownership_controls.app]
+
+  bucket = aws_s3_bucket.app.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_website_configuration" "app" {
+  bucket = aws_s3_bucket.app.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "404.html"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "app" {
+  bucket = aws_s3_bucket.app.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket" "logs" {
+  bucket = replace("${var.domain_name}.${var.base_domain_name}-cf-logs-bucket", "/\\W/", "-")
+  tags = {
+    Environment = var.environment
+    Name        = "${var.domain_name}.${var.base_domain_name}-cf-logs-bucket"
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "logs" {
+  bucket = aws_s3_bucket.logs.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "logs" {
+  depends_on = [aws_s3_bucket_ownership_controls.logs]
+
+  bucket = aws_s3_bucket.logs.id
+  acl    = "private"
+}
